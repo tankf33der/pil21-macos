@@ -24,7 +24,7 @@ LIB = ../lib
 INC = lib/llvm.l vers.l defs.l glob.l dec.l
 SRC = main.l gc.l big.l sym.l io.l db.l apply.l flow.l subr.l
 
-all: $(LIB)/sysdefs $(BIN)/picolisp $(BIN)/balance $(BIN)/ssl $(BIN)/httpGate
+all: $(LIB)/sysdefs $(BIN)/picolisp $(LIB)/ht.so $(LIB)/ext.so $(BIN)/balance $(BIN)/ssl $(BIN)/httpGate
 
 # System definitions
 $(LIB)/sysdefs: sysdefs.c
@@ -53,8 +53,7 @@ lib.bc: pico.h lib.c
 # Extension libraries
 $(LIB)/ext.so: ext.bc
 	$(LLC) ext.bc -o ext.s
-	$(CC) ext.s -o $(LIB)/ext.so $(SHARED)
-	$(STRIP) $(LIB)/ext.so
+	$(CC) -dynamiclib -undefined dynamic_lookup ext.s -o $(LIB)/ext.so
 
 ext.bc: ext.ll
 	$(ASM) -o ext.bc ext.ll
@@ -64,8 +63,7 @@ ext.ll: $(INC) ext.l
 
 $(LIB)/ht.so: ht.bc
 	$(LLC) ht.bc -o ht.s
-	$(CC) ht.s -o $(LIB)/ht.so $(SHARED)
-	$(STRIP) $(LIB)/ht.so
+	$(CC) -dynamiclib -undefined dynamic_lookup ht.s -o $(LIB)/ht.so
 
 ht.bc: ht.ll
 	$(ASM) -o ht.bc ht.ll
